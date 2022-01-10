@@ -24,7 +24,7 @@ const AddUser = ({navigation}) => {
         {
             if(senha.length>=4)
             {
-                let nome;
+                let nome = null;
                 firestore().collection('users').get().then((querySnapshot) => {
                     querySnapshot.forEach(snapshot => {
                         if(snapshot.data().nome==user)
@@ -32,27 +32,29 @@ const AddUser = ({navigation}) => {
                             nome = snapshot.data().nome;
                         }
                     })
+                }).then(()=>
+                {
+                  if(nome)
+                  {
+                      Alert.alert('Nome de usuário já existe!');
+                  }
+                  else
+                  {
+                      firestore()
+                      .collection('users')
+                      .add({
+                          nome: user,
+                          senha:senha,
+                          bairro: bairro,
+                          telefone: telefone
+                      })
+                      .then(() => {
+                          Alert.alert('Cadastrado com sucesso!');
+                          AsyncStorage.setItem('user', JSON.stringify({'nome':user,'bairro':bairro,'telefone':telefone}));
+                          navigation.navigate('Login');
+                      });
+                  }
                 })
-                if(nome)
-                {
-                    Alert.alert('Nome de usuário já existe!');
-                }
-                else
-                {
-                    firestore()
-                    .collection('users')
-                    .add({
-                        nome: user,
-                        senha:senha,
-                        bairro: bairro,
-                        telefone: telefone
-                    })
-                    .then(() => {
-                        Alert.alert('Cadastrado com sucesso!');
-                        AsyncStorage.setItem('user', JSON.stringify({'nome':user,'bairro':bairro,'telefone':telefone}));
-                        navigation.navigate('Login');
-                    });
-                }
             }
             else
             {
